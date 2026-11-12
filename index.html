@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>randomOps</title>
+    <style>
+        #msgBox {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, calc(-50% - 1em));
+            text-align: center;
+        }
+
+        #msgBox::after {
+            content: '';
+            margin-left: .6rem;
+            border-right: 2px solid #777;
+            animation: cursor .9s infinite steps(2);
+        }
+
+        @keyframes cursor {
+            from { border-right: 2px solid #222; }
+            to { border-right: 2px solid #dddddd; }
+        }
+
+        .popup {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.6);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .popup.hidden {
+            display: none;
+        }
+
+        #popupDescription {
+            font-style: italic;
+        }
+
+        .popup-content {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            width: 300px;
+            text-align: center;
+        }
+
+        .popup-options {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin: 20px 0;
+        }
+
+        .popup-options label {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+
+            padding: 10px 14px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .popup-options label:hover {
+            background: #f0f0f0;
+        }
+
+        .popup-options label:has(input:checked) {
+            background: #e0eaff;
+            border-color: #5085d8;
+        }
+
+        .popup-options input {
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div id="msgBox">
+        <p></p>
+    </div>
+
+    <div id="popup" class="popup hidden">
+        <div class="popup-content">
+            <p id="popupDescription">내용</p>
+
+            <form id="popupForm">
+                <div id="popupOptions" class="popup-options"></div>
+
+                <button type="submit">확인</button>
+                <button type="button" onclick="closePopup()">취소</button>
+            </form>
+        </div>
+    </div>
+</div>
+</body>
+<script>
+
+    //==============================메세지 출력
+
+    const msgBox = document.getElementById("msgBox");
+
+    function wait(ms) {
+        return new Promise(res => setTimeout(res, ms))
+    }
+    const message = async(msg, delay) => {
+        msgBox.innerHTML += '<br>';
+        const letter = msg.split("");
+        while (letter.length) {
+            await wait(50);
+            msgBox.innerHTML += letter.shift(); 
+        }
+        await wait(delay);
+    }
+
+    //=============================팝업창
+
+    const popup = document.getElementById("popup");
+    const popupDescription = document.getElementById("popupDescription");
+    const popupOptions = document.getElementById("popupOptions");
+    const popupForm = document.getElementById("popupForm");
+    var popupCallback;
+
+
+    function openPopup(description, options, callback) {
+        popupDescription.textContent = description;
+        popupOptions.innerHTML = "";
+        popupCallback = callback;
+
+        options.forEach((option, index) => {
+            const label = document.createElement("label");
+            const input = document.createElement("input");
+
+            input.type = "radio";
+            input.name = "choice";
+            input.value = index;
+            input.required = true;
+
+            label.append(input, option);
+            popupOptions.appendChild(label);
+        });
+
+        popup.classList.remove("hidden");
+    }
+
+    popupForm.addEventListener("submit", (event) => {
+        event.preventDefault();
+
+        const selected = popupForm.querySelector(
+            'input[name="choice"]:checked'
+        );
+
+        if (popupCallback) popupCallback(selected.value);
+        closePopup();
+    });
+
+    function closePopup() {
+        popup.classList.add("hidden");
+    }
+
+    //============================메인
+    var themeIdx;
+
+    const main = async () => {
+        await message("당신은 오늘따라 로그라이크를 어떻게 굴릴지,");
+        await message("운명에 맡기고 싶어졌다.", 1000);
+        await message("");
+        await message("...", 1000);
+        await message("");
+        await message("어떤 세계가 당신을 기다리고 있을까?", 1000);
+        openPopup("무슨 테마 뛰세요?", 
+        ["팬텀", "미즈키", "사미", "살카즈", "쉐이", "흑류수해", "운명이 당신에게 점지해줄 것이다..."], main2);
+    };
+
+    const main2 = async (idx) => {
+        const themeList = ["고성", "깊은 바다", "얼어붙은 눈밭", "카즈델", "계원", "블랙 플로우"];
+        if (idx == 6) idx =  Math.floor(Math.random() * 5); //일단 흑류수해 빼!!!!!!!!!!!!!!
+        themeIdx = idx;
+        await message(`운명은 당신을 ${themeList[idx]}의 길로 이끌었다.`);
+        await message("");
+        await message("...", 1000);
+        await message("");
+        await message("오늘의 길이 얼마나 험난할지 운명은 알고 싶어한다.", 1000);
+        openPopup("몇승천 뛰시나요?", 
+        [18], main3);
+    }
+
+    const main3 = async (idx) => {
+        const diffList = [18];
+        await message("");
+        await message("...", 1000);
+        await message("");
+        await message("이제, 운명은 더 이상 당신의 의견을 묻지 않을 것이다.", 1000);
+
+        var bundaeList = [
+                        ["지휘 분대", "집합 분대", "지원 분대", 
+                        "예봉 분대", "강습 전술 분대", "방어 전술 분대", 
+                        "원거리 전술 분대", "파괴 전술 분대", "연구 분대", "고급화 분대"], //팬텀
+                        ["마음가짐 분대", "적재적소 분대", "인적자원 분대", 
+                        "지휘 분대", "집합 분대", "지원 분대",
+                        "예봉 분대", "강습 전술 분대", "방어 전술 분대", 
+                        "원거리 전술 분대", "파괴 전술 분대", "연구 분대", "고급화 분대"], //미즈키
+                        ["지휘 분대", "집합 분대", "지원 분대",
+                        "예봉 분대", "강습 전술 분대", "방어 전술 분대", 
+                        "원거리 전술 분대", "파괴 전술 분대", "특훈 분대", "고급화 분대",
+                        "영원한 사냥 분대", "생존 지상 분대", "과학주의 분대"], //사미
+                        ["지휘 분대", "집합 분대", "지원 분대",
+                        "예봉 분대", "강습 전술 분대", "방어 전술 분대", 
+                        "원거리 전술 분대", "파괴 전술 분대", "고급화 분대",
+                        "임기응변 분대", "연금술 분대", "의태학자 분대", "기상천외 분대", "전문가 분대"], //살카즈
+                        ["지휘 분대", "특근 분대", "지원 분대",
+                        "강습 전술 분대", "방어 전술 분대", 
+                        "원거리 전술 분대", "파괴 전술 분대", "고지대 돌파 분대", "지상 돌파 분대", "고급화 분대",
+                        "방문객 분대", "사세대 분대", "천사부 분대", "초강수 분대", "쉐이 울림 분대",
+                        "대리인 분대", "학자 분대", "상인 분대", "꽃다발 분대"] //쉐이
+        ];
+
+        const bundae = bundaeList[themeIdx][Math.floor(bundaeList[themeIdx].length*Math.random())]
+
+        sessionStorage.setItem("theme", themeIdx);
+        sessionStorage.setItem("bundae", bundae);
+        sessionStorage.setItem("diff", 18);
+
+        window.location.href = "enter.html";
+    }
+
+    main();
+</script>
+</html>

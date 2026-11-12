@@ -1,0 +1,118 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        .wrapper{
+            margin: 5em;
+            padding: 1.5rem;
+            position: fixed;
+            top: 50%;
+            right: 0;
+            transform: translate(0,-60%);
+            text-align: right;
+            color: white;
+            background-color: rgba(0,0,0,0.5);
+        }
+        #title{
+            font-size: 10vh;
+            margin: 0;
+        }
+        p{
+            font-size: 2rem;
+            font-weight: 500;
+            margin: 0.5em;
+        }
+        body {
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            background-color: black;
+        }
+        #background {
+            position: fixed;
+            inset: 0;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            opacity: 0;
+            transition: opacity 3s ease;
+            z-index: 0;
+        }
+        #background.show {
+            opacity: 1;
+        }
+        .typing::after {
+            content: "|";
+            display: inline-block;
+            margin-left: 3px;
+            animation: blink 0.7s infinite;
+        }
+
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0; }
+        }
+    </style>
+</head>
+<body>
+    <div id="background"></div>
+
+    <div class="wrapper">
+        <h1 id="title"></h1>
+        <p id="diff"></p>
+        <p id="bundae"></p>
+    </div>
+</body>
+<script>
+    const themeList = ["팬텀 & 크림슨 솔리테어", "미즈키 & 카이룰라 아버", "탐험가의 은빛 서리 끝자락", "살카즈의 영겁 기담", "쉐이의 기이한 계원", "침몰자의 블랙 플로우"];
+    const theme = sessionStorage.getItem("theme");
+    const bundae = sessionStorage.getItem("bundae");
+    const diff = sessionStorage.getItem("diff");
+    const title = document.getElementById("title");
+    const pBundae = document.getElementById("bundae");
+    const pdiff = document.getElementById("diff");
+    const background = document.getElementById("background");
+
+    function wait(ms) {
+        return new Promise(res => setTimeout(res, ms));
+    }
+
+    const typing = async (element, msg, delay) => {
+        element.classList.add("typing");
+        const letter = Array.from(msg);
+        while (letter.length) {
+            await wait(100);
+            element.textContent += letter.shift();
+        }
+        await wait(delay);
+        element.classList.remove("typing");
+    };
+
+    const main = async () => {
+
+        background.style.backgroundImage = `url("enterImages/${theme}.webp")`;
+
+        const img = new Image();
+        img.src = `enterImages/${theme}.webp`;
+        await new Promise(resolve => {
+            if (img.complete) resolve();
+            else img.onload = resolve;
+        });
+        await new Promise(requestAnimationFrame);
+
+        background.classList.add("show");
+
+        typing(title, themeList[theme], 1500);
+        
+        await wait(1500);
+        await typing(pdiff, `${diff}승천`, 1000);
+        await typing(pBundae, bundae, 1000);
+    };
+
+    main();
+</script>
+</html>
