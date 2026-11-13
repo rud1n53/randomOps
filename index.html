@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="mainData.js"></script>
     <title>randomOps</title>
     <style>
         #msgBox {
@@ -186,6 +187,9 @@
         const themeList = ["고성", "깊은 바다", "얼어붙은 눈밭", "카즈델", "계원", "블랙 플로우"];
         if (idx == 6) idx =  Math.floor(Math.random() * 5); //일단 흑류수해 빼!!!!!!!!!!!!!!
         themeIdx = idx;
+        await message("");
+        await message("...", 1000);
+        await message("");
         await message(`운명은 당신을 ${themeList[idx]}의 길로 이끌었다.`);
         await message("");
         await message("...", 1000);
@@ -200,36 +204,17 @@
         await message("");
         await message("...", 1000);
         await message("");
-        await message("이제, 운명은 더 이상 당신의 의견을 묻지 않을 것이다.", 1000);
-
-        var bundaeList = [
-                        ["지휘 분대", "집합 분대", "지원 분대", 
-                        "예봉 분대", "강습 전술 분대", "방어 전술 분대", 
-                        "원거리 전술 분대", "파괴 전술 분대", "연구 분대", "고급화 분대"], //팬텀
-                        ["마음가짐 분대", "적재적소 분대", "인적자원 분대", 
-                        "지휘 분대", "집합 분대", "지원 분대",
-                        "예봉 분대", "강습 전술 분대", "방어 전술 분대", 
-                        "원거리 전술 분대", "파괴 전술 분대", "연구 분대", "고급화 분대"], //미즈키
-                        ["지휘 분대", "집합 분대", "지원 분대",
-                        "예봉 분대", "강습 전술 분대", "방어 전술 분대", 
-                        "원거리 전술 분대", "파괴 전술 분대", "특훈 분대", "고급화 분대",
-                        "영원한 사냥 분대", "생존 지상 분대", "과학주의 분대"], //사미
-                        ["지휘 분대", "집합 분대", "지원 분대",
-                        "예봉 분대", "강습 전술 분대", "방어 전술 분대", 
-                        "원거리 전술 분대", "파괴 전술 분대", "고급화 분대",
-                        "임기응변 분대", "연금술 분대", "의태학자 분대", "기상천외 분대", "전문가 분대"], //살카즈
-                        ["지휘 분대", "특근 분대", "지원 분대",
-                        "강습 전술 분대", "방어 전술 분대", 
-                        "원거리 전술 분대", "파괴 전술 분대", "고지대 돌파 분대", "지상 돌파 분대", "고급화 분대",
-                        "방문객 분대", "사세대 분대", "천사부 분대", "초강수 분대", "쉐이 울림 분대",
-                        "대리인 분대", "학자 분대", "상인 분대", "꽃다발 분대"] //쉐이
-        ];
+        await message("이제, 운명은 더 이상 당신의 의견을 묻지 않을 것이다.", 5000);
 
         const bundae = bundaeList[themeIdx][Math.floor(bundaeList[themeIdx].length*Math.random())]
+        var tmp = 2;
+        if (themeIdx == "4") tmp += 2;
+        const stCart = startMemCategories[Math.floor(Math.random()*tmp)];
 
         sessionStorage.setItem("theme", themeIdx);
         sessionStorage.setItem("bundae", bundae);
         sessionStorage.setItem("diff", 18);
+        sessionStorage.setItem("stCart", JSON.stringify(stCart));
 
         window.location.href = "enter.html";
     }

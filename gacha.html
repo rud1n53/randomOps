@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="mainData.js"></script>
+    <script src="memData.js"></script>
+    <title>대원들이 당신을 돕고자 합니다..</title>
+</head>
+<body>
+    <p id="tmp"></p>
+</body>
+<script>
+    const stCart = JSON.parse(sessionStorage.getItem("stCart"));
+    
+    function shuffle(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+            let j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
+        }
+        return array;
+    }
+
+    var rarity = [5, 4, 3] //0-based라 1 더해서 생각해야함
+    var hopeNeedNow = hopeNeed[theme];
+
+
+    rarity = shuffle(rarity);
+    const candList1 = memList[rarity[0]][stCart[1]][0];
+    const candList2 = memList[rarity[1]][stCart[2]][0];
+    const candList3 = memList[rarity[2]][stCart[2]][0];
+    const tmp = document.getElementById("tmp");
+    
+
+    var cand1 = candList1[Math.floor(Math.random()*candList1.length)]
+    var cand2 = candList2[Math.floor(Math.random()*candList2.length)]
+    var cand3 = candList3[Math.floor(Math.random()*candList3.length)]
+    tmp.innerText += cand1;
+    tmp.innerText += cand2;
+    tmp.innerText += cand3;
+</script>
+</html>

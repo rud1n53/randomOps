@@ -4,6 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="mainData.js"></script>
+    <script src="memData.js"></script>
     <title>Document</title>
     <style>
         .wrapper{
@@ -39,7 +41,7 @@
             background-position: center;
             background-repeat: no-repeat;
             opacity: 0;
-            transition: opacity 3s ease;
+            transition: opacity 5s ease;
             z-index: 0;
         }
         #background.show {
@@ -65,6 +67,8 @@
         <h1 id="title"></h1>
         <p id="diff"></p>
         <p id="bundae"></p>
+        <p id="descript" style="font-size: 1rem;"></p>
+        <p id="continue" style="font-size: 1rem;"></p>
     </div>
 </body>
 <script>
@@ -72,9 +76,12 @@
     const theme = sessionStorage.getItem("theme");
     const bundae = sessionStorage.getItem("bundae");
     const diff = sessionStorage.getItem("diff");
+    const stCart = JSON.parse(sessionStorage.getItem("stCart"));
     const title = document.getElementById("title");
     const pBundae = document.getElementById("bundae");
     const pdiff = document.getElementById("diff");
+    const pDescript = document.getElementById("descript")
+    const pContinue = document.getElementById("continue");
     const background = document.getElementById("background");
 
     function wait(ms) {
@@ -85,7 +92,7 @@
         element.classList.add("typing");
         const letter = Array.from(msg);
         while (letter.length) {
-            await wait(100);
+            await wait(70);
             element.textContent += letter.shift();
         }
         await wait(delay);
@@ -106,13 +113,21 @@
 
         background.classList.add("show");
 
-        typing(title, themeList[theme], 1500);
+        typing(title, themeList[theme], 2000);
         
-        await wait(1500);
+        await wait(3000);
         await typing(pdiff, `${diff}승천`, 1000);
         await typing(pBundae, bundae, 1000);
-    };
+        await typing(pDescript, `${stCart[0]} : ${memKor[stCart[1]]} / ${memKor[stCart[2]]} / ${memKor[stCart[3]]}`, 1000);
+        //if (bundae == "특근 분대")
+        pContinue.innerText = "아무 곳이나 눌러 대원을 모집하세요. 마음에 들 때까지 언제고.";
+        pContinue.classList.add("typing");
 
+        document.body.style.cursor = "pointer";
+        document.addEventListener('click', (event) => {
+            window.open('gacha.html', '_blank', 'false');
+        });
+    };
     main();
 </script>
 </html>
