@@ -37,14 +37,16 @@
         #background {
             position: fixed;
             inset: 0;
+            transform: scale(1.08);
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
             opacity: 0;
-            transition: opacity 5s ease;
+            transition: opacity 5s ease, transform 5s ease;
             z-index: 0;
         }
         #background.show {
+            transform: scale(1);
             opacity: 1;
         }
         .typing::after {

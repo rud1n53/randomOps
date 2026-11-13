@@ -12,6 +12,9 @@
 </body>
 <script>
     const stCart = JSON.parse(sessionStorage.getItem("stCart"));
+    const theme = sessionStorage.getItem("theme");
+    const bundae = sessionStorage.getItem("bundae");
+    const diff = sessionStorage.getItem("diff");
     
     function shuffle(array) {
         for (let i = array.length - 1; i > 0; i--) {
@@ -23,18 +26,87 @@
 
     var rarity = [5, 4, 3] //0-based라 1 더해서 생각해야함
     var hopeNeedNow = hopeNeed[theme];
+    var maxHope = 6;
 
+    if(theme == 0 || theme == 2 || theme == 3){ //팬텀, 사미, 살카즈
+        if(bundae == "지원 분대") maxHope += 2;
+    }
+    if(theme == 1){ //미즈키
+        if(diff >= 4){
+            for(let i = 2; i < 6; i++) hopeNeedNow[i]++;
+        }
+        if(bundae == "인적자원 분대"){
+            for(let i = 2; i < 5; i++) {if(hopeNeedNow[i] > 0) hopeNeedNow[i]--}
+        }
+    }
+    if(theme == 2 && diff >= 6){ //사미
+        for(let i = 3; i < 6; i++) hopeNeedNow[i]++;
+    }
+    if(theme == 3){ //살카즈
+        if(diff >= 13){
+            for(let i = 4; i < 6; i++) hopeNeedNow[i]++;
+            if(diff >= 15) hopeNeedNow[5]++;
+        }
+        if(bundae == "박학다식 분대") maxHope += 2;
+        if(bundae == "도면 제작 분대") maxHope += 1;
+        if(bundae == "의태학자 분대") maxHope += 1;
+        // 기상천외는 랜덤으로 일부 들고오니까 고려하는 것을 포기합니다 하하!!!! 필요 희망 좀 줄 수도 있지
+    }
+    if(theme == 4 && diff >= 8){
+        for(let i = 4; i < 6; i++) hopeNeedNow[i]++;
+        if(diff >= 15) hopeNeedNow[5]++;
+    }
 
-    rarity = shuffle(rarity);
-    const candList1 = memList[rarity[0]][stCart[1]][0];
-    const candList2 = memList[rarity[1]][stCart[2]][0];
-    const candList3 = memList[rarity[2]][stCart[2]][0];
-    const tmp = document.getElementById("tmp");
+    function chooseRarity(){
+        var totalHope = 0;
+        var totalMemCnt = 0;
+        for(let i = 5; i >= 0; i--){
+            hopeNow = hopeNeedNow[i];
+            //===================================== 예외 처리
+            if(i >= 3 && (theme == 1 || theme == 2 || theme == 3) && bundae == "강습 전술 분대" && stCart[totalMemCnt-1] <= 1 ) hopeNow -= 2;
+            if(i >= 3 && (theme == 1 || theme == 2 || theme == 3) && bundae == "방어 전술 분대" && (stCart[totalMemCnt-1] == 2 || stCart[totalMemCnt-1] == 6 )) hopeNow -= 2;
+            if(i >= 3 && (theme == 1 || theme == 2 || theme == 3) && bundae == "원거리 전술 분대" && (stCart[totalMemCnt-1] == 3 || stCart[totalMemCnt-1] == 5 )) hopeNow -= 2;
+            if(i >= 3 && (theme == 1 || theme == 2 || theme == 3) && bundae == "파괴 전술 분대" && (stCart[totalMemCnt-1] == 4 || stCart[totalMemCnt-1] == 7 )) hopeNow -= 2;
+
+            if(i >= 3 && (theme == 4) && bundae == "강습 전술 분대" && stCart[totalMemCnt+1] <= 1 ) hopeNow -= 1;
+            if(i >= 3 && (theme == 4) && bundae == "방어 전술 분대" && (stCart[totalMemCnt+1] == 2 || stCart[totalMemCnt+1] == 6 )) hopeNow -= 1;
+            if(i >= 3 && (theme == 4) && bundae == "원거리 전술 분대" && (stCart[totalMemCnt+1] == 3 || stCart[totalMemCnt+1] == 5 )) hopeNow -= 1;
+            if(i >= 3 && (theme == 4) && bundae == "파괴 전술 분대" && (stCart[totalMemCnt+1] == 4 || stCart[totalMemCnt+1] == 7 )) hopeNow -= 1;
+            if(i >= 3 && (theme == 4) && bundae == "고지대 돌파 분대" && stCart[totalMemCnt+1] >= 3 && stCart[totalMemCnt+1] <= 6) hopeNow -= 2;
+            if(i >= 3 && (theme == 4) && bundae == "지상 돌파 분대" && (stCart[totalMemCnt+1] <= 2 || stCart[totalMemCnt+1] == 7 )) hopeNow -= 2;
+            //=====================================
+            if(hopeNow + totalHope > maxHope) continue;
+            var rand = (i == 5) ? 1 : Math.random();
+            if(rand > 0.15){
+                rarity[totalMemCnt] = i;
+                totalMemCnt++;
+                totalHope += hopeNow;
+                i++;
+                if(totalMemCnt == 3) break;
+            }
+            if(i == 0 && totalMemCnt < 3) i = 5;
+        }
+    }
+
+    var candList1 = [];
+    var candList2 = [];
+    var candList3 = [];
+
+    while(candList1.length == 0 || candList2.length == 0 || candList3.length == 0 ){
+        chooseRarity();
+        rarity = shuffle(rarity);
+        candList1 = memList[rarity[0]][stCart[1]][0];
+        candList2 = memList[rarity[1]][stCart[2]][0];
+        candList3 = memList[rarity[2]][stCart[3]][0];
+    }
     
+    const tmp = document.getElementById("tmp");
 
     var cand1 = candList1[Math.floor(Math.random()*candList1.length)]
-    var cand2 = candList2[Math.floor(Math.random()*candList2.length)]
-    var cand3 = candList3[Math.floor(Math.random()*candList3.length)]
+    var cand2 = cand1;
+    var cand3 = cand1;
+    while(cand2 == cand1) cand2 = candList2[Math.floor(Math.random()*candList2.length)];
+    while(cand3 == cand1 || cand3 == cand2) cand3 = candList3[Math.floor(Math.random()*candList3.length)]
     tmp.innerText += cand1;
     tmp.innerText += cand2;
     tmp.innerText += cand3;
