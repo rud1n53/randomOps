@@ -279,7 +279,17 @@
     }
 
     const main3 = async (minDiff, maxDiff) => {
-        const diff = Math.floor(Math.random() * (maxDiff - minDiff + 1)) + minDiff;
+        const randomInt = (max) => {
+            const limit = Math.floor(4294967296 / max) * max; //2^32
+            const arr = new Uint32Array(1);
+            let val;
+            do {
+                crypto.getRandomValues(arr);
+                val = arr[0];
+            } while (val >= limit);
+            return val % max;
+        };
+        const diff = Math.floor(randomInt(maxDiff - minDiff + 1)) + minDiff;
 
         await message("");
         await message("...", 1000);
@@ -298,7 +308,7 @@
 
         window.location.href = "enter.html";
     };
-    
+
     main();
 
 </script>

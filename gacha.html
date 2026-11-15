@@ -121,7 +121,7 @@
             display: flex;
             align-items: center;
             justify-content: flex-end;
-            gap: 24px;
+            gap: 30px;
             width: min(65vw, 800px);
             height: 27vh;
 
@@ -137,11 +137,13 @@
         }
         .res-img {
             width: min(15vw, 180px);
-            height: 100%;
+            aspect-ratio: 1 / 1;
             flex-shrink: 0;
-            background: white;
-            border: 1px solid rgba(255,255,255,0.7);
+            background: rgba(0, 0, 0, 0.55);
+            border: 0;
             box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            background-position: center;
+            background-size: cover;
         }
         #result.show .res-row {
             animation: resultAppear 0.4s cubic-bezier(0.2, 0.8, 0.3, 1) forwards;
@@ -178,22 +180,23 @@
     <div id="result">
         <div class="res-row">
             <div class="res-name" id="res1"></div>
-            <div class="res-img"></div>
+            <div class="res-img" id="img1"></div>
         </div>
         <div class="res-row">
             <div class="res-name" id="res2"></div>
-            <div class="res-img"></div>
+            <div class="res-img" id="img2"></div>
         </div>
         <div class="res-row">
             <div class="res-name" id="res3"></div>
-            <div class="res-img"></div>
+            <div class="res-img" id="img3"></div>
         </div>
     </div>
 </body>
 <script> //서류 펼치는 애니메이션
     const table = document.getElementById("table");
     const cover = document.getElementById("cover");
-
+    const imgs = document.getElementsByClassName("res-img");
+    const names = document.getElementsByClassName("res-name");
     let isOpened = false;
     let isArrived = false;
 
@@ -201,7 +204,6 @@
         isArrived = true;
         cover.style.cursor = "pointer";
     });
-
     cover.addEventListener("click", function() {
         if (isOpened) return;
         if (!isArrived) {
@@ -215,9 +217,10 @@
         table.classList.add("open");
         table.classList.add("spread");
         setTimeout(() => {
-            document.getElementById("res1").textContent = cand1;
-            document.getElementById("res2").textContent = cand2;
-            document.getElementById("res3").textContent = cand3;
+            for(let i = 0; i < 3; i++){
+                names[i].textContent = candsList[i];
+                imgs[i].style.backgroundImage = `url("./img/charimgs/${rarity[i]+1}star/${candsList[i].replace(/ /g,"")}.webp")`;
+            }
             document.getElementById("result").classList.add("show");
         }, 1500);
     });
@@ -228,19 +231,18 @@
     const bundae = sessionStorage.getItem("bundae");
     const diff = sessionStorage.getItem("diff");
     const cards = document.getElementsByClassName("card");
-    
-    function shuffle(array) {
-        const randomInt = (max) => {
-            const limit = Math.floor(4294967296 / max) * max;
-            const arr = new Uint32Array(1);
-            let val;
-            do {
-                crypto.getRandomValues(arr);
-                val = arr[0];
-            } while (val >= limit);
-            return val % max;
-        };
 
+    const randomInt = (max) => {
+        const limit = Math.floor(4294967296 / max) * max;
+        const arr = new Uint32Array(1);
+        let val;
+        do {
+            crypto.getRandomValues(arr);
+            val = arr[0];
+        } while (val >= limit);
+        return val % max;
+    };
+    function shuffle(array) {
         for (let i = array.length - 1; i > 0; i--) {
             let j = randomInt(i + 1);
             [array[i], array[j]] = [array[j], array[i]];
@@ -324,7 +326,6 @@
         candList2 = memList[rarity[1]][randStCart[1]][0];
         candList3 = memList[rarity[2]][randStCart[2]][0];
     }
-    
     var cand1 = candList1[Math.floor(Math.random()*candList1.length)]
     var cand2 = cand1;
     var cand3 = cand1;
@@ -334,6 +335,7 @@
     for (let i = 0; i < 3; i++){
         cards[i+1].style.backgroundImage = `url('${imageRef[rarity[i]]}')`;
     }
+    var candsList = [cand1, cand2, cand3];
     console.log(cand1);
     console.log(cand2);
     console.log(cand3);
