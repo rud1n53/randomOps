@@ -6,9 +6,18 @@
     <script src="mainData.js"></script>
     <script src="memData.js"></script>
     <title>대원들이 당신을 돕고자 합니다..</title>
+    <style>
+        #tmp2 {
+            width: 330px;
+            height: 470px;
+            background-image: url('img/01_document_white.png');
+            background-position: center;
+        }
+    </style>
 </head>
 <body>
     <p id="tmp"></p>
+    <div id="tmp2"></div>
 </body>
 <script>
     const stCart = JSON.parse(sessionStorage.getItem("stCart"));
