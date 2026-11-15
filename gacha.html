@@ -10,7 +10,6 @@
         * {
             box-sizing: border-box;
         }
-
         body {
             margin: 0;
             width: 100vw;
@@ -25,43 +24,33 @@
             height: 100%;
             perspective: 1200px;
         }
-
         .card {
-            width: 330px;
-            height: 470px;
-
+            width: 220px;
+            height: 313px;
             position: absolute;
             left: 50%;
             top: 50%;
-
             background-position: center;
             background-size: contain;
             background-repeat: no-repeat;
-
             transform: translate(-50%, -50%);
             transform-origin: 50% 85%;
-
             transition:
                 transform 0.65s cubic-bezier(0.2, 0.8, 0.3, 1),
                 filter 0.4s;
         }
-
         #card1, #card2, #card3 {
             opacity: 0;
         }
-
         #card1 {
             z-index: 3;
         }
-
         #card2 {
             z-index: 2;
         }
-
         #card3 {
             z-index: 1;
         }
-
         #cover {
             background-image: url('img/05_rhodes_island_background.png');
             z-index: 100;
@@ -74,16 +63,13 @@
                 opacity: 0;
                 transform: translate(calc(-50% - 500px), -50%) rotate(-5deg);
             }
-
             70% {
                 opacity: 1;
                 transform: translate(calc(-50% + 12px), -50%) rotate(1deg);
             }
-
             85% {
                 transform: translate(calc(-50% - 5px), -50%) rotate(-0.4deg);
             }
-
             100% {
                 transform: translate(-50%, -50%) rotate(0deg);
             }
@@ -93,28 +79,92 @@
             transform: translate(-90%, -50%) rotate(-10deg);
             transition-delay: transform 0s;
         }
-
         #table.spread #card2 {
             transform: translate(-50%, -50%) rotate(11deg);
             transition-delay: transform 0.03s;
         }
-
         #table.spread #card3 {
             transform: translate(-10%, -50%) rotate(28deg);
             transition-delay: transform 0.07s;
         }
-
         #table.spread .card:not(#cover) {
             filter: drop-shadow(0 8px 8px rgba(0,0,0,0.35));
         }
-
         #table.open .card{
             opacity: 1;
         }
-
         #table.open #cover {
             pointer-events: none;
             transform: translate(-100%, -50%) rotate(-30deg);
+        }
+
+        #result {
+            position: fixed;
+            inset: 0;
+            z-index: 200;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: flex-end;
+            gap: 12px;
+            padding: 4vh 5vw;
+            background: rgba(0, 0, 0, 0.55);
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+        #result.show {
+            opacity: 1;
+            visibility: visible;
+        }
+        .res-row { /*오퍼 한 줄*/
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 24px;
+            width: min(65vw, 800px);
+            height: 27vh;
+
+            opacity: 0;
+        }
+        .res-name {
+            flex: 1;
+            text-align: right;
+            color: white;
+            font-size: clamp(20px, 3vw, 36px);
+            font-weight: bold;
+            text-shadow: 0 2px 8px black;
+        }
+        .res-img {
+            width: min(15vw, 180px);
+            height: 100%;
+            flex-shrink: 0;
+            background: white;
+            border: 1px solid rgba(255,255,255,0.7);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+        }
+        #result.show .res-row {
+            animation: resultAppear 0.4s cubic-bezier(0.2, 0.8, 0.3, 1) forwards;
+        }
+        #result.show .res-row:nth-child(1) {
+            animation-delay: 0s;
+        }
+        #result.show .res-row:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+        #result.show .res-row:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes resultAppear {
+            from {
+                opacity: 0;
+                transform: translateX(60px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
         }
     </style>
 </head>
@@ -124,6 +174,20 @@
         <div class="card" id="card1"></div>
         <div class="card" id="card2"></div>
         <div class="card" id="card3"></div>
+    </div>
+    <div id="result">
+        <div class="res-row">
+            <div class="res-name" id="res1"></div>
+            <div class="res-img"></div>
+        </div>
+        <div class="res-row">
+            <div class="res-name" id="res2"></div>
+            <div class="res-img"></div>
+        </div>
+        <div class="res-row">
+            <div class="res-name" id="res3"></div>
+            <div class="res-img"></div>
+        </div>
     </div>
 </body>
 <script> //서류 펼치는 애니메이션
@@ -140,7 +204,6 @@
 
     cover.addEventListener("click", function() {
         if (isOpened) return;
-
         if (!isArrived) {
             cover.style.animation = "none";
             cover.style.transform = "translate(-100%, -50%) rotate(-30deg)";
@@ -151,6 +214,12 @@
         isOpened = true;
         table.classList.add("open");
         table.classList.add("spread");
+        setTimeout(() => {
+            document.getElementById("res1").textContent = cand1;
+            document.getElementById("res2").textContent = cand2;
+            document.getElementById("res3").textContent = cand3;
+            document.getElementById("result").classList.add("show");
+        }, 1500);
     });
 </script>
 <script> //멤버 정하는 알고리즘
