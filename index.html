@@ -13,7 +13,6 @@
             transform: translate(-50%, calc(-50% - 1em));
             text-align: center;
         }
-
         #msgBox::after {
             content: '';
             margin-left: .6rem;
@@ -35,13 +34,47 @@
             align-items: center;
             z-index: 1000;
         }
-
         .popup.hidden {
             display: none;
         }
-
         #popupDescription {
             font-style: italic;
+        }
+        #popupForm button {
+            padding: 9px 20px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            background: white;
+            color: #444;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        #popupForm button[type="submit"] {
+            background: #5085d8;
+            border-color: #5085d8;
+            color: white;
+            font-weight: 500;
+        }
+        #popupForm button[type="submit"]:hover {
+            background: #3d70c2;
+            border-color: #3d70c2;
+        }
+        #popupForm button[type="button"]:hover {
+            background: #f0f0f0;
+            border-color: #aaa;
+        }
+
+        #popupForm button:focus-visible {
+            outline: 2px solid #5085d8;
+            outline-offset: 2px;
+        }
+        #popupForm input[type="radio"] {
+            accent-color: #5085d8;
+        }
+        #popupForm input[type="radio"]:focus-visible {
+            outline: none;
+            filter: drop-shadow(0 0 3px rgba(80, 133, 216, 0.9));
         }
 
         .popup-content {
@@ -51,14 +84,12 @@
             width: 300px;
             text-align: center;
         }
-
         .popup-options {
             display: flex;
             flex-direction: column;
             gap: 8px;
             margin: 20px 0;
         }
-
         .popup-options label {
             display: flex;
             align-items: center;
@@ -71,18 +102,43 @@
             cursor: pointer;
             transition: background 0.2s;
         }
-
         .popup-options label:hover {
             background: #f0f0f0;
         }
-
         .popup-options label:has(input:checked) {
             background: #e0eaff;
             border-color: #5085d8;
         }
-
         .popup-options input {
             cursor: pointer;
+        }
+        .popup-range {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin: 20px 0;
+        }
+        .popup-range input {
+            width: 90px;
+            height: 45px;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            background: white;
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+            outline: none;
+            transition: border-color 0.2s, background 0.2s;
+        }
+        .popup-range input:focus {
+            border-color: #5085d8;
+            background: #f5f8ff;
+        }
+        .popup-range span {
+            font-size: 20px;
+            color: #777;
         }
     </style>
 </head>
@@ -128,24 +184,22 @@
     const popupDescription = document.getElementById("popupDescription");
     const popupOptions = document.getElementById("popupOptions");
     const popupForm = document.getElementById("popupForm");
-    var popupCallback;
-    var popupMode = "choice";
+    var popCallback;
+    var mode = "choice";
 
     function openPopup(description, options, callback) {
-        popupMode = "choice";
+        mode = "choice";
         popupDescription.textContent = description;
         popupOptions.innerHTML = "";
-        popupCallback = callback;
+        popCallback = callback;
 
         options.forEach((option, index) => {
             const label = document.createElement("label");
             const input = document.createElement("input");
-
             input.type = "radio";
             input.name = "choice";
             input.value = index;
             input.required = true;
-
             label.append(input, option);
             popupOptions.appendChild(label);
         });
@@ -153,21 +207,18 @@
         popup.classList.remove("hidden");
     }
 
-    function openRangePopup(description, min, max, callback) {
-        popupMode = "range";
+    function openRangePopup(description, min, max, callback){
+        mode = "range";
         popupDescription.textContent = description;
         popupOptions.innerHTML = "";
-        popupCallback = callback;
+        popCallback = callback;
 
         const range = document.createElement("div");
         range.className = "popup-range";
-
         range.innerHTML = `
-            <input type="number" id="minDiff"
-                min="${min}" max="${max}" value="${min}" required>
-            ~
-            <input type="number" id="maxDiff"
-                min="${min}" max="${max}" value="${max}" required>
+            <input type="number" id="minDiff" min="${min}" max="${max}" value="${min}" required>
+            <span>~</span>
+            <input type="number" id="maxDiff" min="${min}" max="${max}" value="${max}" required>
         `;
 
         popupOptions.appendChild(range);
@@ -177,29 +228,24 @@
     popupForm.addEventListener("submit", (event) => {
         event.preventDefault();
 
-        if (popupMode == "choice") {
-            const selected = popupForm.querySelector(
-                'input[name="choice"]:checked'
-            );
-
-            if (popupCallback) popupCallback(selected.value);
+        if(mode == "choice"){
+            const selected = popupForm.querySelector('input[name="choice"]:checked');
+            if (popCallback) popCallback(selected.value);
         }
-        else if (popupMode == "range") {
+        else if(mode == "range"){
             const min = Number(document.getElementById("minDiff").value);
             const max = Number(document.getElementById("maxDiff").value);
-
-            if (min < 1 || max > 18 || min > max) {
+            if(min < 1 || max > 18 || min > max){
                 alert("난이도 범위를 다시 확인해주세요.");
                 return;
             }
-
-            if (popupCallback) popupCallback(min, max);
+            if (popCallback) popCallback(min, max);
         }
 
         closePopup();
     });
 
-    function closePopup() {
+    function closePopup(){
         popup.classList.add("hidden");
     }
 
@@ -241,10 +287,8 @@
         await message("이제, 운명은 더 이상 당신의 의견을 묻지 않을 것이다.", 5000);
 
         const bundae = bundaeList[themeIdx][Math.floor(bundaeList[themeIdx].length * Math.random())];
-
         var tmp = 2;
         if (themeIdx == "4") tmp += 2;
-
         const stCart = startMemCategories[Math.floor(Math.random() * tmp)];
 
         sessionStorage.setItem("theme", themeIdx);
@@ -254,7 +298,8 @@
 
         window.location.href = "enter.html";
     };
-
+    
     main();
+
 </script>
 </html>
