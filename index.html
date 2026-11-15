@@ -97,9 +97,7 @@
 
             <form id="popupForm">
                 <div id="popupOptions" class="popup-options"></div>
-
                 <button type="submit">확인</button>
-                <button type="button" onclick="closePopup()">취소</button>
             </form>
         </div>
     </div>
@@ -131,9 +129,10 @@
     const popupOptions = document.getElementById("popupOptions");
     const popupForm = document.getElementById("popupForm");
     var popupCallback;
-
+    var popupMode = "choice";
 
     function openPopup(description, options, callback) {
+        popupMode = "choice";
         popupDescription.textContent = description;
         popupOptions.innerHTML = "";
         popupCallback = callback;
@@ -154,14 +153,49 @@
         popup.classList.remove("hidden");
     }
 
+    function openRangePopup(description, min, max, callback) {
+        popupMode = "range";
+        popupDescription.textContent = description;
+        popupOptions.innerHTML = "";
+        popupCallback = callback;
+
+        const range = document.createElement("div");
+        range.className = "popup-range";
+
+        range.innerHTML = `
+            <input type="number" id="minDiff"
+                min="${min}" max="${max}" value="${min}" required>
+            ~
+            <input type="number" id="maxDiff"
+                min="${min}" max="${max}" value="${max}" required>
+        `;
+
+        popupOptions.appendChild(range);
+        popup.classList.remove("hidden");
+    }
+
     popupForm.addEventListener("submit", (event) => {
         event.preventDefault();
 
-        const selected = popupForm.querySelector(
-            'input[name="choice"]:checked'
-        );
+        if (popupMode == "choice") {
+            const selected = popupForm.querySelector(
+                'input[name="choice"]:checked'
+            );
 
-        if (popupCallback) popupCallback(selected.value);
+            if (popupCallback) popupCallback(selected.value);
+        }
+        else if (popupMode == "range") {
+            const min = Number(document.getElementById("minDiff").value);
+            const max = Number(document.getElementById("maxDiff").value);
+
+            if (min < 1 || max > 18 || min > max) {
+                alert("난이도 범위를 다시 확인해주세요.");
+                return;
+            }
+
+            if (popupCallback) popupCallback(min, max);
+        }
+
         closePopup();
     });
 
@@ -180,12 +214,12 @@
         await message("");
         await message("어떤 세계가 당신을 기다리고 있을까?", 1000);
         openPopup("무슨 테마 뛰세요?", 
-        ["팬텀", "미즈키", "사미", "살카즈", "쉐이", "흑류수해", "운명이 당신에게 점지해줄 것이다..."], main2);
+        ["팬텀", "미즈키", "사미", "살카즈", "쉐이", "운명이 당신에게 점지해줄 것이다..."], main2);
     };
 
     const main2 = async (idx) => {
         const themeList = ["고성", "깊은 바다", "얼어붙은 눈밭", "카즈델", "계원", "블랙 플로우"];
-        if (idx == 6) idx =  Math.floor(Math.random() * 5); //일단 흑류수해 빼!!!!!!!!!!!!!!
+        if (idx == 5) idx =  Math.floor(Math.random() * 5); //일단 흑류수해 빼!!!!!!!!!!!!!!
         themeIdx = idx;
         await message("");
         await message("...", 1000);
@@ -195,29 +229,31 @@
         await message("...", 1000);
         await message("");
         await message("오늘의 길이 얼마나 험난할지 운명은 알고 싶어한다.", 1000);
-        openPopup("몇승천 뛰시나요?", 
-        [18], main3);
+        openRangePopup("몇 승천 뛰시나요?", 1, 18, main3);
     }
 
-    const main3 = async (idx) => {
-        const diffList = [18];
+    const main3 = async (minDiff, maxDiff) => {
+        const diff = Math.floor(Math.random() * (maxDiff - minDiff + 1)) + minDiff;
+
         await message("");
         await message("...", 1000);
         await message("");
         await message("이제, 운명은 더 이상 당신의 의견을 묻지 않을 것이다.", 5000);
 
-        const bundae = bundaeList[themeIdx][Math.floor(bundaeList[themeIdx].length*Math.random())]
+        const bundae = bundaeList[themeIdx][Math.floor(bundaeList[themeIdx].length * Math.random())];
+
         var tmp = 2;
         if (themeIdx == "4") tmp += 2;
-        const stCart = startMemCategories[Math.floor(Math.random()*tmp)];
+
+        const stCart = startMemCategories[Math.floor(Math.random() * tmp)];
 
         sessionStorage.setItem("theme", themeIdx);
         sessionStorage.setItem("bundae", bundae);
-        sessionStorage.setItem("diff", 18);
+        sessionStorage.setItem("diff", diff);
         sessionStorage.setItem("stCart", JSON.stringify(stCart));
 
         window.location.href = "enter.html";
-    }
+    };
 
     main();
 </script>
