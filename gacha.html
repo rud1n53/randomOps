@@ -226,10 +226,10 @@
     });
 </script>
 <script> //멤버 정하는 알고리즘
-    const stCart = JSON.parse(sessionStorage.getItem("stCart"));
-    const theme = sessionStorage.getItem("theme");
-    const bundae = sessionStorage.getItem("bundae");
-    const diff = sessionStorage.getItem("diff");
+    var stCart = JSON.parse(sessionStorage.getItem("stCart"));
+    var theme = sessionStorage.getItem("theme");
+    var bundae = sessionStorage.getItem("bundae");
+    var diff = sessionStorage.getItem("diff");
     const cards = document.getElementsByClassName("card");
 
     const randomInt = (max) => {
